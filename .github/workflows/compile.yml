@@ -1,0 +1,50 @@
+name: Minimal Linux Kernel Compiler for J2
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v3
+
+    - name: Install Compiler Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc build-essential libncurses5-dev libssl-dev xz-utils wget flex bison libelf-dev
+
+    - name: Download Linaro Toolchain
+      run: |
+        cd ~
+        wget https://linaro.org
+        tar -xf gcc-linaro-4.9-2017.01-x86_64_arm-eabi.tar.xz
+        echo "TOOLCHAIN_PATH=$HOME/gcc-linaro-4.9-2017.01-x86_64_arm-eabi/bin" >> $GITHUB_ENV
+
+    - name: Configure and Compile Minimal Kernel
+      run: |
+        export PATH=$TOOLCHAIN_PATH:$PATH
+        export ARCH=arm
+        export CROSS_COMPILE=arm-eabi-
+        
+        make exynos3475-ja_lte_defconfig
+        
+        ./scripts/config --disable CONFIG_ANDROID
+        ./scripts/config --disable CONFIG_VIDEO_DEV
+        ./scripts/config --disable CONFIG_WIRELESS
+        ./scripts/config --disable CONFIG_WLAN
+        
+        ./scripts/config --enable CONFIG_SND_SOC
+        ./scripts/config --enable CONFIG_INPUT_KEYBOARD
+        ./scripts/config --enable CONFIG_POWER_SUPPLY
+        ./scripts/config --enable CONFIG_EXYNOS_THERMAL
+        ./scripts/config --enable CONFIG_CPU_FREQ_STAT
+        ./scripts/config --enable CONFIG_PROC_FS
+        
+        make -j$(nproc) zImage
+
+    - name: Upload Finished File
+      uses: actions/upload-artifact@v3
+      with:
+        name: J2-Minimal-Kernel
+        path: arch/arm/boot/zImage
