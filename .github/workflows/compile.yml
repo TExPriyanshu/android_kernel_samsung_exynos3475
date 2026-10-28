@@ -44,7 +44,7 @@ jobs:
         make -j$(nproc) zImage
 
     - name: Upload Finished File
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: J2-Minimal-Kernel
         path: arch/arm/boot/zImage
