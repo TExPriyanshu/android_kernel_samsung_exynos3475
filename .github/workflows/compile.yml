@@ -9,23 +9,15 @@ jobs:
     - name: Checkout Kernel Source
       uses: actions/checkout@v4
 
-    - name: Install Compiler Tools
+    - name: Install Compiler and Toolchain Tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y bc build-essential libncurses5-dev libssl-dev xz-utils wget flex bison libelf-dev
-
-    - name: Download Linaro Toolchain
-      run: |
-        cd ~
-        wget https://linaro.org
-        tar -xf gcc-linaro-4.9-2017.01-x86_64_arm-eabi.tar.xz
-        echo "TOOLCHAIN_PATH=$HOME/gcc-linaro-4.9-2017.01-x86_64_arm-eabi/bin" >> $GITHUB_ENV
+        sudo apt-get install -y bc build-essential libncurses5-dev libssl-dev xz-utils wget flex bison libelf-dev gcc-arm-linux-gnueabi
 
     - name: Configure and Compile Minimal Kernel
       run: |
-        export PATH=$TOOLCHAIN_PATH:$PATH
         export ARCH=arm
-        export CROSS_COMPILE=arm-eabi-
+        export CROSS_COMPILE=arm-linux-gnueabi-
         
         make exynos3475-ja_lte_defconfig
         
