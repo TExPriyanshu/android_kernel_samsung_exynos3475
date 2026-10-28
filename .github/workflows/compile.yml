@@ -19,7 +19,7 @@ jobs:
         export ARCH=arm
         export CROSS_COMPILE=arm-linux-gnueabi-
         
-        make make lineage_j2lte_defconfig
+        make lineage_j2lte_defconfig
         
         ./scripts/config --disable CONFIG_ANDROID
         ./scripts/config --disable CONFIG_VIDEO_DEV
